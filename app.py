@@ -103,7 +103,8 @@ def login():
                 session['email'] = authority[0]['email']
                 session['name'] = authority[0]['name']  # Store authority name
                 session['role'] = 'Authority'
-                return redirect(url_for('authority_dashboard'))
+                # Changed to redirect to dashboard.html instead of authority_dashboard route
+                return redirect('/dashboard.html')
         
         flash('Invalid login credentials', 'danger')
     
@@ -197,8 +198,12 @@ def logout():
     session.clear()
     return redirect(url_for('index'))
 
+# Moved report route to be accessible from user-page.html
 @app.route('/report', methods=['GET', 'POST'])
 def report():
+    if not is_logged_in('User'):
+        return redirect(url_for('login'))
+        
     if request.method == 'POST':
         # Process form data
         category = request.form['category']
@@ -206,7 +211,7 @@ def report():
         description = request.form['description']
         location = request.form['location']
         landmark = request.form.get('landmark', '')
-        contact = request.form.get('contact', '')
+        contact = request.form.get('contact', session.get('email', ''))  # Use logged-in user's email if available
         
         # Handle image uploads
         images = []
@@ -254,7 +259,7 @@ def report():
         )
         
         flash(f'Your complaint has been submitted successfully. Your reference ID is {reference_id}', 'success')
-        return redirect(url_for('track', complaint_id=reference_id))
+        return redirect(url_for('user_page'))
     
     return render_template('report.html')
 
@@ -452,6 +457,13 @@ def api_complaints():
     
     return jsonify({'success': True, 'data': complaints})
 
+# Serve static files for dashboard.html
+@app.route('/dashboard.html')
+def serve_dashboard():
+    if is_logged_in('Authority'):
+        return redirect(url_for('authority_dashboard'))
+    
+    return render_template('dashboard.html', name=session.get('name'))
+
 if __name__ == '__main__':
     app.run(debug=True)
-

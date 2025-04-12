@@ -250,16 +250,15 @@
       document.getElementById("authSection").classList.add("active");
 
       // Update role labels
-      function selectRole(role) {
-  document.getElementById("roleSelection").style.display = "none";
-  document.getElementById("authSection").classList.add("active");
+      const roleLabelText = role === "User" ? "Citizen" : "Government Authority";
+      document.getElementById("roleLabel").innerText = `You are logging in as: ${roleLabelText}`;
+      document.getElementById("loginRole").value = role;
+      document.getElementById("registerRole").value = role;
+    }
 
-  const roleLabelText = role === "User" ? "Citizen" : "Government Authority";
-  document.getElementById("roleLabel").innerText = `You are logging in as: ${roleLabelText}`;
-  document.getElementById("loginRole").value = role;
-  document.getElementById("registerRole").value = role;
-}
-
+    function goBackToRoleSelection() {
+      document.getElementById("roleSelection").style.display = "flex";
+      document.getElementById("authSection").classList.remove("active");
     }
 
     function switchTab(tab) {
@@ -267,7 +266,7 @@
       document.querySelectorAll('.form').forEach(f => f.classList.remove('active'));
 
       document.getElementById(tab).classList.add('active');
-      document.querySelector('.tab'[onclick*='${tab}']).classList.add('active');
+      document.querySelector(`.tab[onclick*="${tab}"]`).classList.add('active');
     }
   </script>
 </body>
